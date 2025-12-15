@@ -14,6 +14,10 @@ LR = 1e-3
 MODEL_PATH = "models/mnist_cnn.pth"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# 调试输出
+print(f"🎯 运行设备: {DEVICE}")
+print(f"📊 超参: batch_size={BATCH_SIZE}, epochs={EPOCHS}, lr={LR}")
+
 os.makedirs("models", exist_ok=True)
 
 # 模型

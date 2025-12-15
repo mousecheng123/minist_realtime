@@ -109,7 +109,8 @@ class DigitRecognizerApp:
             state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
             self.model.load_state_dict(state_dict)
             self.model.eval()
-            print(f"模型加载成功，运行在: {DEVICE}")
+            print(f"✅ 模型加载成功，运行在: {DEVICE}")
+            print(f"📦 模型架构:\n{self.model}")
         except Exception as e:
             messagebox.showerror("模型错误", str(e))
             self.root.destroy()
@@ -155,7 +156,11 @@ class DigitRecognizerApp:
         # 1. 裁剪内容区域 (Bounding Box)
         bbox = img.getbbox()
         if bbox is None:
+            print("⚠️ 画布为空，请先画数字")
             return None # 空白画布
+        
+        print(f"\n📍 调试信息:")
+        print(f"   1️⃣ 裁剪区域 bbox: {bbox}")
             
         img_cropped = img.crop(bbox)
         
@@ -165,6 +170,8 @@ class DigitRecognizerApp:
         w, h = img_cropped.size
         ratio = min(target_size / w, target_size / h)
         new_w, new_h = int(w * ratio), int(h * ratio)
+        
+        print(f"   2️⃣ 原始数字大小: {w}x{h}, 缩放比例: {ratio:.2f}, 新大小: {new_w}x{new_h}")
         
         # 使用高质量重采样
         if hasattr(Image, "Resampling"):
@@ -193,6 +200,8 @@ class DigitRecognizerApp:
         # 标准化 (x - mean) / std
         tensor = (tensor - MNIST_MEAN) / MNIST_STD
         
+        print(f"   3️⃣ 最终张量形状: {tensor.shape}, 值范围: [{tensor.min():.2f}, {tensor.max():.2f}]")
+        
         return tensor
 
     def predict(self):
@@ -208,6 +217,8 @@ class DigitRecognizerApp:
             
             pred_idx = np.argmax(probs)
             confidence = probs[pred_idx]
+            
+            print(f"   🎯 预测结果: {pred_idx}, 置信度: {confidence*100:.1f}%")
             
             # 更新 UI
             self.result_label.config(text=str(pred_idx))
